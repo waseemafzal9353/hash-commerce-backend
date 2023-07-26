@@ -8,7 +8,7 @@ export type ReviewDocument = mongoose.HydratedDocument<Review>;
 @Schema()
 export class Review {
   @Prop(String)
-  review?: string;
+  review!: string;
 
   @Prop({type: mongoose.Schema.Types.ObjectId, ref:'User'})
   user!: User;

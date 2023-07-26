@@ -8,6 +8,12 @@ export type AdminDocument = mongoose.HydratedDocument<Admin>;
 export class Admin {
   @Prop(String)
   admin_name!: string;  
+
+  @Prop(String)
+  admin_role!: {
+    type: string,
+    default:'admin'
+  }  
 }
 
 export const CatSchema = SchemaFactory.createForClass(Admin);
