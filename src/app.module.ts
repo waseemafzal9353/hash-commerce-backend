@@ -7,7 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProductModule } from './product/product.module';
 import { ConfigModule } from '@nestjs/config';
 @Module({
-  imports: [AuthModule, MongooseModule.forRoot('mongodb://0.0.0.0:27017/hashCommerce'), ProductModule,
+  imports: [AuthModule, MongooseModule.forRoot(`mongodb://0.0.0.0:27017/hashcommerce` ), ProductModule,
   ConfigModule.forRoot({
     isGlobal: true, 
     envFilePath: '.env',

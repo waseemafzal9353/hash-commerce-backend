@@ -8,5 +8,5 @@ export class CreateUserDto{
     user_city!: string;
     user_deliveryAddress!: string;
     user_phone!: string;
-    file!: FileInterface;
+    uploadAvatarLink!: unknown;
 }
