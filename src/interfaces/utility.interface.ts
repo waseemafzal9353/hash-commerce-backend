@@ -38,4 +38,9 @@ export interface userEmailInterface{
   is_user_email_confirmed?: boolean;
 } 
 
+export interface confirmNewUserEmailInterface{
+  user_id?: Types.ObjectId;
+  email?: string;
+}
+
  

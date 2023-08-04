@@ -5,31 +5,49 @@ import { Model } from 'mongoose';
 import { BusinessException } from 'src/Exceptions/business.exception';
 import { GlobalServices } from 'src/assistantServices/global.service';
 import { AuthService } from 'src/auth/auth.service';
-import { jwtPayloadInterface, userEmailInterface } from 'src/interfaces/utility.interface';
+import { confirmNewUserEmailInterface, jwtPayloadInterface, userEmailInterface } from 'src/interfaces/utility.interface';
 import { EmailConfirmationModel } from 'src/schemas/email.schema';
 
 
 @Injectable()
 export class EmailServices {
-
+    
+    private userFromEmailSchema: userEmailInterface;
+  
     constructor(
         @Inject(forwardRef(() => AuthService))
         private authServices: AuthService,
         @InjectModel('EmailConfirmation') private emailConfirmationModel: Model<EmailConfirmationModel>,
         @Inject(ConfigService) private configService: ConfigService,
-        private globalServices: GlobalServices) { };
+        private globalServices: GlobalServices,
+      ) { };
 
-    sendConfirmationLink = async (email: string) => {
-
+    sendConfirmationLink = async (emailConfirmationOptions: confirmNewUserEmailInterface) => {
+      console.log("emailConfirmationOptions", emailConfirmationOptions)
         try {
+            if(emailConfirmationOptions.user_id) {
+                this.userFromEmailSchema = await this.emailConfirmationModel.findById(emailConfirmationOptions.user_id)
+            }
+            if(emailConfirmationOptions.email){
+                this.userFromEmailSchema = await this.emailConfirmationModel.findOne({email: emailConfirmationOptions.email})
+            }
+            if(this.userFromEmailSchema.is_user_email_confirmed) {
+                throw new BusinessException(
+                    'users',
+                    `User email already confirmed`,
+                    `User email already confirmed`,
+                    HttpStatus.BAD_REQUEST,
+                );
+            }
+            
             const payload: jwtPayloadInterface = {
-                sub: email
+                sub: this.userFromEmailSchema.user_email 
             }
             const token = this.globalServices.createJWTToken(payload)
             const url = `${this.configService.get<string>('EMAIL_CONFIRMATION_URL')}?token=${token}`
             const text = `Welcome to hashCommerce. To confirm the email address, click here: ${url}`;
             return await this.globalServices.sendMail({
-                to: email,
+                to: this.userFromEmailSchema.user_email ,
                 subject: 'Email Confirmation',
                 text
             })
@@ -38,7 +56,7 @@ export class EmailServices {
             throw new BusinessException(
                 'users',
                 `Could send email due to: ${error.message}.`,
-                `Could not send confirmation email to: ${email}.`,
+                `Could not send confirmation email to: ${this.userFromEmailSchema.user_email }.`,
                 HttpStatus.INTERNAL_SERVER_ERROR,
             );
         }

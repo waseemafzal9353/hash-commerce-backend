@@ -38,10 +38,9 @@ export class AuthController {
   }
 
   const {user_email} = user
-  
 
   if(success) {
-    await this.emailServices.sendConfirmationLink(`${user_email}`)
+    await this.emailServices.sendConfirmationLink({email: `${user_email}`})
     // const accessToken = await this.globalServices.createJWTAccessToken(payload)
     // response.cookie('access-token', accessToken, {
     //     httpOnly: true,
