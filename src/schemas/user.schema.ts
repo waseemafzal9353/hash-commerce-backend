@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsString, IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import * as mongoose from 'mongoose'
+import { Exclude } from 'class-transformer';
 
 export type UserDocument = mongoose.HydratedDocument<User>;
 
-@Schema()
+@Schema({timestamps: true})
 export class User {
 
   @IsString()
@@ -19,12 +20,13 @@ export class User {
 
   @IsEmail()
   @IsNotEmpty()
-  @Prop(String)
+  @Prop({type: String, unique: true})
   user_email!: string;
-  
+   
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
+  @Exclude()
   @Prop(String)
   user_password!: string;
 

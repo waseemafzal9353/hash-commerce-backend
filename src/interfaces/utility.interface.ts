@@ -1,14 +1,14 @@
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 
-export class UserInterface {
-  _id!: ObjectId;
-  user_firstName!: string;
-  user_lastName!: string;
-  user_email!: string;
-  user_password!: string;
-  user_city!: string;
-  user_deliveryAddress!: string;
-  user_phone!: string;
+export interface UserInterface {
+  _id: Types.ObjectId;
+  user_firstName: string;
+  user_lastName: string;
+  user_email: string;
+  user_password: string;
+  user_city: string;
+  user_deliveryAddress: string;
+  user_phone: string;
 }
 
 export interface FileInterface {
@@ -23,6 +23,19 @@ export interface FileInterface {
   buffer: Buffer;
 }
 
-export interface jwtPayload {
-  sub: string,
+export interface jwtPayloadInterface {
+  sub: string;
 }
+
+export interface jwtDecodePayloadInterface{
+  sub: string;
+  token: string;
+}
+
+export interface userEmailInterface{
+  user_id: Types.ObjectId;
+  user_email: string;
+  is_user_email_confirmed?: boolean;
+} 
+
+ 
