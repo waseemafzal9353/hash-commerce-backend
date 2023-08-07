@@ -11,27 +11,36 @@ import { EmailConfirmationModel } from 'src/schemas/email.schema';
 
 @Injectable()
 export class EmailServices {
-    
+
     private userFromEmailSchema: userEmailInterface;
-  
+
     constructor(
         @Inject(forwardRef(() => AuthService))
         private authServices: AuthService,
         @InjectModel('EmailConfirmation') private emailConfirmationModel: Model<EmailConfirmationModel>,
         @Inject(ConfigService) private configService: ConfigService,
         private globalServices: GlobalServices,
-      ) { };
+    ) { };
+
+    createUserEmail = async (userEmailData: userEmailInterface) => {
+        return await this.emailConfirmationModel.create(userEmailData)
+    };
+
+    getUserByEmail = async(user_email: string) => {
+        return await this.emailConfirmationModel.findOne({
+            user_email
+        })   
+    }
 
     sendConfirmationLink = async (emailConfirmationOptions: confirmNewUserEmailInterface) => {
-      console.log("emailConfirmationOptions", emailConfirmationOptions)
         try {
-            if(emailConfirmationOptions.user_id) {
+            if (emailConfirmationOptions.user_id) {
                 this.userFromEmailSchema = await this.emailConfirmationModel.findById(emailConfirmationOptions.user_id)
             }
-            if(emailConfirmationOptions.email){
-                this.userFromEmailSchema = await this.emailConfirmationModel.findOne({email: emailConfirmationOptions.email})
+            if (emailConfirmationOptions.user_email) {
+                this.userFromEmailSchema = await this.emailConfirmationModel.findOne({ email: emailConfirmationOptions.user_email })
             }
-            if(this.userFromEmailSchema.is_user_email_confirmed) {
+            if (this.userFromEmailSchema.is_user_email_confirmed) {
                 throw new BusinessException(
                     'users',
                     `User email already confirmed`,
@@ -39,15 +48,15 @@ export class EmailServices {
                     HttpStatus.BAD_REQUEST,
                 );
             }
-            
+
             const payload: jwtPayloadInterface = {
-                sub: this.userFromEmailSchema.user_email 
+                sub: this.userFromEmailSchema.user_email
             }
             const token = this.globalServices.createJWTToken(payload)
             const url = `${this.configService.get<string>('EMAIL_CONFIRMATION_URL')}?token=${token}`
             const text = `Welcome to hashCommerce. To confirm the email address, click here: ${url}`;
             return await this.globalServices.sendMail({
-                to: this.userFromEmailSchema.user_email ,
+                to: this.userFromEmailSchema.user_email,
                 subject: 'Email Confirmation',
                 text
             })
@@ -56,15 +65,10 @@ export class EmailServices {
             throw new BusinessException(
                 'users',
                 `Could send email due to: ${error.message}.`,
-                `Could not send confirmation email to: ${this.userFromEmailSchema.user_email }.`,
+                `Could not send confirmation email to: ${this.userFromEmailSchema.user_email}.`,
                 HttpStatus.INTERNAL_SERVER_ERROR,
             );
         }
-    };
-
-
-    createUserEmail = async (userEmailData: userEmailInterface) => {
-        return await this.emailConfirmationModel.create(userEmailData)
     };
 
     confirmNewUserEmail = async (email: string) => {
@@ -79,6 +83,7 @@ export class EmailServices {
         }
         await this.markEmailAsCofirmed(email)
     };
+    
     markEmailAsCofirmed = async (email: string) => {
         return await this.emailConfirmationModel.updateOne({ email },
             { is_user_email_confirmed: true }

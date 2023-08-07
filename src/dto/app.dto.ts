@@ -34,7 +34,7 @@ export class CreateUserDto{
     @IsString()
     @IsNotEmpty()
     uploadAvatarLink!: string;
-}
+};
 
 export class ConfirmEmailDto {
     
@@ -45,4 +45,16 @@ export class ConfirmEmailDto {
     @IsString()
     @IsNotEmpty()
     email: string;
-  }
+};
+
+export class LoginUserDto{
+
+    @IsString()
+    @IsNotEmpty()
+    user_email!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    user_password!: string;
+
+};

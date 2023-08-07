@@ -9,7 +9,7 @@ export interface UserInterface {
   user_city: string;
   user_deliveryAddress: string;
   user_phone: string;
-}
+};
 
 export interface FileInterface {
   fieldname: string;
@@ -21,26 +21,30 @@ export interface FileInterface {
   filename: string;
   path: string;
   buffer: Buffer;
-}
+};
 
 export interface jwtPayloadInterface {
-  sub: string;
-}
+  sub: any;
+};
 
 export interface jwtDecodePayloadInterface{
-  sub: string;
+  sub: any;
   token: string;
-}
+};
 
 export interface userEmailInterface{
   user_id: Types.ObjectId;
   user_email: string;
   is_user_email_confirmed?: boolean;
-} 
+};
 
 export interface confirmNewUserEmailInterface{
   user_id?: Types.ObjectId;
-  email?: string;
-}
+  user_email?: string;
+};
 
+export interface validateUserInterface{
+  user_email: string;
+  user_password: string;
+};
  

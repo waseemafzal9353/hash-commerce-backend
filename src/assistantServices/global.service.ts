@@ -29,10 +29,8 @@ export class GlobalServices {
   };
 
 
-  createJWTToken = (payload: jwtPayloadInterface): string => {
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_SECRET_KEY'), expiresIn: '86400000'
-    });
+  createJWTToken =  async (payload: jwtPayloadInterface): Promise<string> => {            
+    return this.jwtService.sign({payload});   
   };
 
   sendMail = async (options: Mail.Options) => {

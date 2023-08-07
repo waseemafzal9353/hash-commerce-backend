@@ -1,5 +1,4 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { EmailServices } from './email.service';
 import { ConfirmEmailDto } from 'src/dto/app.dto';
 import { GlobalServices } from 'src/assistantServices/global.service';
