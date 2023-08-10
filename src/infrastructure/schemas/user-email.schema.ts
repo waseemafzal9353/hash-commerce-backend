@@ -14,11 +14,8 @@ export class EmailConfirmationModel {
 
     @IsEmail()
     @IsNotEmpty()
-    @Prop(String)
-    user_email!: {
-        type: string;
-        unique: true
-    }
+    @Prop({type: String, unique: true})
+    user_email!: string
 
     @IsNotEmpty()
     @Prop({type: Boolean, default: false})

@@ -1,8 +1,8 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { FileInterface } from "src/interfaces/utility.interface";
+import { FileInterface } from "src/infrastructure/interfaces/utility.interface";
 import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
-import { BusinessException } from "src/Exceptions/business.exception";
+import { BusinessException } from "src/infrastructure/Exceptions/business.exception";
 
 @Injectable()
 export class UploadFileService {

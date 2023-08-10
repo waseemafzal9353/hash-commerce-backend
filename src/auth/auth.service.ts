@@ -1,14 +1,13 @@
 import { HttpStatus, Inject, Injectable, Res, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types, Model } from 'mongoose';
-import { CreateUserDto } from 'src/dto/app.dto';
-import { BusinessException } from 'src/Exceptions/business.exception';
-import { User } from 'src/schemas/user.schema';
+import { CreateUserDto } from 'src/infrastructure/DTOs/user.dto';
+import { BusinessException } from 'src/infrastructure/Exceptions/business.exception';
+import { User } from 'src/infrastructure/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
-import { GlobalServices } from 'src/assistantServices/global.service';
 import { EmailServices } from 'src/email/email.service';
-import { UserInterface, jwtPayloadInterface, userEmailInterface, validateUserInterface } from 'src/interfaces/utility.interface';
-import { Response } from 'express';
+import { UserInterface, jwtPayloadInterface, userEmailInterface, validateUserInterface } from 'src/infrastructure/interfaces/utility.interface';
+import { GlobalService } from 'src/global/global.service';
 
 @Injectable()
 export class AuthService {
@@ -16,16 +15,23 @@ export class AuthService {
         @Inject(forwardRef(() => EmailServices))
         private emailServices: EmailServices,
         @InjectModel('User') private userModel: Model<User>,
-        private globalServices: GlobalServices,
+        @Inject(forwardRef(() => GlobalService))
+        private globalServices: GlobalService,
     ) { }
     private readonly saltRound = 10;
-        public salt=10
     // need to define return types of all the methods
 
     getUserByEmail = async (user_email: string) => {
         const user: UserInterface = await this.userModel.findOne({
             user_email
-        }).lean()       
+        }).lean()
+        return user
+    };
+
+    getUserById = async (user_id: string) => {
+        const user: UserInterface = await this.userModel.findOne({
+            _id: user_id
+        }).lean()
         return user
     };
     createUser = async (createUserDto: CreateUserDto) => {
@@ -69,34 +75,19 @@ export class AuthService {
         }
     };
 
-    setAccessToken = async (response: Response, email: string): Promise<void> => {
-
-        const userFromEmailSchema = await this.emailServices.getUserByEmail(email)
-
-        if (userFromEmailSchema.is_user_email_confirmed) {
-            const payload: jwtPayloadInterface = {
-                sub: userFromEmailSchema.user_id
-            }
-            const accessToken = this.globalServices.createJWTToken(payload)
-            response.cookie('access-token', accessToken, {
-                httpOnly: true,
-                maxAge: 86400000
-            })
+    validateUser = async (payload: validateUserInterface) => {        
+        const userByEmail = (await this.getUserByEmail(payload.email));
+        if (!userByEmail) {
+            throw new BusinessException(
+                'users',
+                'User credentials do not match.',
+                `User Credentials do not match!`,
+                HttpStatus.UNAUTHORIZED,
+            )
         }
-        throw new BusinessException(
-            'users',
-            'Email not confirmed',
-            `${email} is not confirmed. Please confirm your email to keep session!`,
-            HttpStatus.BAD_REQUEST,
-        )
-    };
-
-    validateUser = async (payload: validateUserInterface) => {       
-        const userByEmail = (await this.getUserByEmail(payload.user_email));
-        const comparedPasswords = await bcrypt.compare(payload.user_password,
+        const comparedPasswords = await bcrypt.compare(payload.password,
             userByEmail.user_password)
-
-        if (!userByEmail || !comparedPasswords) {
+        if (!comparedPasswords) {
             throw new BusinessException(
                 'users',
                 'User credentials do not match.',
@@ -108,8 +99,9 @@ export class AuthService {
         return user
     }
 
-    login =  async (email: string) => {      
-        return await this.globalServices.createJWTToken(email)
+    login = async (email: string) => {
+        const token = await this.globalServices.createJWTToken(email)
+        return token
     }
 
 

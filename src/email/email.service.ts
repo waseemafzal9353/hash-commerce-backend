@@ -2,11 +2,11 @@ import { HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BusinessException } from 'src/Exceptions/business.exception';
-import { GlobalServices } from 'src/assistantServices/global.service';
+import { BusinessException } from 'src/infrastructure/Exceptions/business.exception';
 import { AuthService } from 'src/auth/auth.service';
-import { confirmNewUserEmailInterface, jwtPayloadInterface, userEmailInterface } from 'src/interfaces/utility.interface';
-import { EmailConfirmationModel } from 'src/schemas/email.schema';
+import { confirmNewUserEmailInterface, jwtPayloadInterface, userEmailInterface } from 'src/infrastructure/interfaces/utility.interface';
+import { EmailConfirmationModel } from 'src/infrastructure/schemas/user-email.schema';
+import { GlobalService } from 'src/global/global.service';
 
 
 @Injectable()
@@ -19,8 +19,9 @@ export class EmailServices {
         private authServices: AuthService,
         @InjectModel('EmailConfirmation') private emailConfirmationModel: Model<EmailConfirmationModel>,
         @Inject(ConfigService) private configService: ConfigService,
-        private globalServices: GlobalServices,
-    ) { };
+        @Inject(forwardRef(() => GlobalService))
+        private globalServices: GlobalService,
+        ) { };
 
     createUserEmail = async (userEmailData: userEmailInterface) => {
         return await this.emailConfirmationModel.create(userEmailData)

@@ -44,7 +44,7 @@ export interface confirmNewUserEmailInterface{
 };
 
 export interface validateUserInterface{
-  user_email: string;
-  user_password: string;
+  email: string;
+  password: string;
 };
  

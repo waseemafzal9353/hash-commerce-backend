@@ -1,22 +1,25 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { User, UserSchema } from 'src/schemas/user.schema';
+import { User, UserSchema } from 'src/infrastructure/schemas/user.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { GlobalServices } from 'src/assistantServices/global.service';
 import { EmailServices } from 'src/email/email.service';
-import { EmailConfirmationSchema } from 'src/schemas/email.schema';
+import { EmailConfirmationModel, EmailConfirmationSchema } from 'src/infrastructure/schemas/user-email.schema';
 import { EmailModule } from 'src/email/email.module';
-import { LocalStrategy } from 'src/strategies/local.strategy';
-import { JwtStrategy } from 'src/strategies/jwt.strategy';
+import { LocalStrategy } from 'src/infrastructure/strategies/local.strategy';
+import { JwtStrategy } from 'src/infrastructure/strategies/jwt.strategy';
+import { GlobalService } from 'src/global/global.service';
+import { GlobalModule } from 'src/global/global.module';
 
 
 @Module({
   imports:[MongooseModule.forFeature([{name:'User', schema: UserSchema}, 
   {name:"EmailConfirmation", schema:EmailConfirmationSchema}]), 
-  forwardRef(()=> EmailModule) ],
+  forwardRef(()=> EmailModule), forwardRef(()=> GlobalModule)
+],
   controllers: [AuthController],
-  providers: [AuthService,User, GlobalServices, EmailServices, LocalStrategy, JwtStrategy],
+  providers: [AuthService, User, GlobalService,
+  EmailServices, LocalStrategy, JwtStrategy, EmailConfirmationModel],
   exports: [AuthService],
 })
 export class AuthModule {}
