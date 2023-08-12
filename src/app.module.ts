@@ -16,12 +16,14 @@ import { GlobalModule } from './global/global.module';
   imports: [AuthModule, MongooseModule.forRoot("mongodb+srv://waseekhan9353:was33khan@commerce.8yekcls.mongodb.net/commerce?retryWrites=true&w=majority"), ProductModule,
   ConfigModule.forRoot({
     isGlobal: true, 
-    // envFilePath: '.env',
-  }), JwtModule.register({
+    envFilePath: '.env',  
+  }), 
+  PassportModule.register({ defaultStrategy: 'local' }), 
+  JwtModule.register({
     global: true,
-    secret: process.env.JWT_SECRET_KEY,
-    signOptions: { expiresIn: 60000 },
-  }), EmailModule,  PassportModule.register({ defaultStrategy: 'local' }), GlobalModule,],
+    secret: `${process.env.JWT_SECRET_KEY}`,
+    signOptions: { expiresIn: '1h' },
+  }), EmailModule, GlobalModule,],
   controllers: [AppController],
   providers: [AppService, LocalStrategy, JwtStrategy],
 })

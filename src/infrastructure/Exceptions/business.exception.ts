@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 
-export type ErrorDomain = 'users' | 'orders' | 'generic' | 'AWS';
+export type ErrorDomain = 'users' | 'orders' | 'generic' | 'AWS' | 'auth';
 
 export class BusinessException extends Error {
   public readonly id: string;

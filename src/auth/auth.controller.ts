@@ -85,26 +85,15 @@ export class AuthController {
     }
   }
 
-  @Get('profile')
   @UseGuards(JwtAuthGuard)
+  @Get('/profile')
   async getProfile(@Request() req) {
-    console.log(req.user);
-    
-    // delete user.user_password
-
+    const {user} = req
+    delete user.user_password
     return {
       success: true,
-      // user
+      user
     }
   }
-
-  @Get('checkAuth')
-  @UseGuards(LocalAuthGuard)
-  async checkAuth() {
-    return {
-      authenticated: true
-    }
-  }
-
 
 }

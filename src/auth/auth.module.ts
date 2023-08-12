@@ -11,11 +11,9 @@ import { JwtStrategy } from 'src/infrastructure/strategies/jwt.strategy';
 import { GlobalService } from 'src/global/global.service';
 import { GlobalModule } from 'src/global/global.module';
 
-
 @Module({
   imports:[MongooseModule.forFeature([{name:'User', schema: UserSchema}, 
-  {name:"EmailConfirmation", schema:EmailConfirmationSchema}]), 
-  forwardRef(()=> EmailModule), forwardRef(()=> GlobalModule)
+  {name:"EmailConfirmation", schema:EmailConfirmationSchema}]), forwardRef(()=> EmailModule), forwardRef(()=> GlobalModule),
 ],
   controllers: [AuthController],
   providers: [AuthService, User, GlobalService,

@@ -37,19 +37,24 @@ export class GlobalService {
   
   
     createJWTToken =  async (payload: jwtPayloadInterface): Promise<string> => {            
-      return this.jwtService.sign({payload});   
+      const {sub} = payload
+      return this.jwtService.sign({sub}, 
+      {secret: this.configService.get<string>('JWT_SECRET_KEY')});   
     };
   
     setAccessToken = async (response: Response, sub: string) => {
  
       const userFromEmailSchema = await this.emailServices.getUserByEmail(sub)
-  
       if (userFromEmailSchema.is_user_email_confirmed) {
           const payload: jwtPayloadInterface = {
               sub: userFromEmailSchema.user_email
           }
           const accessToken = await this.createJWTToken(payload)          
-          response.cookie("token", accessToken)
+          response.cookie("token", accessToken, {
+            httpOnly: true, 
+            // secure: process.env.NODE_ENV === 'production',
+            path: "/"
+          })
           return {
               success: true
           }
@@ -79,7 +84,7 @@ export class GlobalService {
           return payload.sub;
         }
         throw new BusinessException(
-          'AWS',
+          'auth',
           `Bad Request.`,
           'Bad Request',
           HttpStatus.BAD_REQUEST,
@@ -87,15 +92,15 @@ export class GlobalService {
       } catch (error) {
         if (error?.name === 'TokenExpiredError') {
           throw new BusinessException(
-            'AWS',
-            `Could not upload file due to ${error.message}.`,
+            'auth',
+            `Token Expired`,
             'Email confirmation token expired',
             HttpStatus.BAD_REQUEST,
           );
         }
         throw new BusinessException(
-          'AWS',
-          `Could not upload file due to ${error.message}.`,
+          'auth',
+          `Bad confirmation token`,
           'Bad confirmation token',
           HttpStatus.BAD_REQUEST,
         );
