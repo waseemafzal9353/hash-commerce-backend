@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { User } from "../schemas/user.schema";
 
 export interface UserInterface {
   _id: Types.ObjectId;
@@ -9,6 +10,8 @@ export interface UserInterface {
   user_city: string;
   user_deliveryAddress: string;
   user_phone: string;
+  // user_avatar: string
+  success?: boolean;
 };
 
 export interface FileInterface {
@@ -47,4 +50,9 @@ export interface validateUserInterface{
   email: string;
   password: string;
 };
+
+export interface loginInterface{
+  user: User;
+  success: boolean
+}
  

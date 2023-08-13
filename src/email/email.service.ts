@@ -33,13 +33,13 @@ export class EmailServices {
         })   
     }
 
-    sendConfirmationLink = async (emailConfirmationOptions: confirmNewUserEmailInterface) => {
+    sendConfirmationLink = async (emailConfirmationOptions: confirmNewUserEmailInterface) => {        
         try {
             if (emailConfirmationOptions.user_id) {
                 this.userFromEmailSchema = await this.emailConfirmationModel.findById(emailConfirmationOptions.user_id)
             }
             if (emailConfirmationOptions.user_email) {
-                this.userFromEmailSchema = await this.emailConfirmationModel.findOne({ email: emailConfirmationOptions.user_email })
+                this.userFromEmailSchema = await this.emailConfirmationModel.findOne({ user_email: emailConfirmationOptions.user_email })
             }
             if (this.userFromEmailSchema.is_user_email_confirmed) {
                 throw new BusinessException(
@@ -49,10 +49,9 @@ export class EmailServices {
                     HttpStatus.BAD_REQUEST,
                 );
             }
-
             const payload: jwtPayloadInterface = {
                 sub: this.userFromEmailSchema.user_email
-            }
+            }      
             const token = this.globalServices.createJWTToken(payload)
             const url = `${this.configService.get<string>('EMAIL_CONFIRMATION_URL')}?token=${token}`
             const text = `Welcome to hashCommerce. To confirm the email address, click here: ${url}`;

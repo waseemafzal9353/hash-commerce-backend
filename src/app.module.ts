@@ -12,6 +12,7 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './infrastructure/strategies/local.strategy';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { GlobalModule } from './global/global.module';
+import { AdminModule } from './admin/admin.module';
 @Module({
   imports: [AuthModule, MongooseModule.forRoot("mongodb+srv://waseekhan9353:was33khan@commerce.8yekcls.mongodb.net/commerce?retryWrites=true&w=majority"), ProductModule,
   ConfigModule.forRoot({
@@ -23,7 +24,7 @@ import { GlobalModule } from './global/global.module';
     global: true,
     secret: `${process.env.JWT_SECRET_KEY}`,
     signOptions: { expiresIn: '1h' },
-  }), EmailModule, GlobalModule,],
+  }), EmailModule, GlobalModule, AdminModule,],
   controllers: [AppController],
   providers: [AppService, LocalStrategy, JwtStrategy],
 })

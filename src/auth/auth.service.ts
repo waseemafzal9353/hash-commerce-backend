@@ -21,7 +21,7 @@ export class AuthService {
     private readonly saltRound = 10;
     // need to define return types of all the methods
 
-    getUserByEmail = async (user_email: string) => {
+    getUserByEmail = async (user_email: string): Promise<UserInterface> => {
         const user: UserInterface = await this.userModel.findOne({
             user_email
         }).lean()
@@ -34,7 +34,7 @@ export class AuthService {
         }).lean()
         return user
     };
-    createUser = async (createUserDto: CreateUserDto) => {
+    createUser = async (createUserDto: CreateUserDto): Promise<UserInterface> => {
 
         const { user_email, user_password, user_phone } = createUserDto
         const findUserByEmail = await this.getUserByEmail(user_email)
@@ -68,14 +68,21 @@ export class AuthService {
             { user_id: userCreated._id, user_email: userCreated.user_email })
         await this.emailServices.createUserEmail(userEmailData)
 
-
-        return {
-            user: userCreated,
+        const user: UserInterface = {
+            _id: userCreated._id,
+            user_firstName: userCreated.user_firstName,
+            user_lastName: userCreated.user_lastName,
+            user_email: userCreated.user_email,
+            user_password: userCreated.user_password,
+            user_city: userCreated.user_city,
+            user_deliveryAddress: userCreated.user_deliveryAddress,
+            user_phone: userCreated.user_phone,
             success: true,
-        }
+        };
+        return user
     };
 
-    validateUser = async (payload: validateUserInterface) => {        
+    validateUser = async (payload: validateUserInterface) => {
         const userByEmail = (await this.getUserByEmail(payload.email));
         if (!userByEmail) {
             throw new BusinessException(

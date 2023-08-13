@@ -3,8 +3,8 @@ import {
   HttpStatus, Request, UploadedFile, ParseFilePipeBuilder, Res, UseGuards, 
   Get
 } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from 'src/infrastructure/DTOs/user.dto';
-import { FileInterface, UserInterface } from 'src/infrastructure/interfaces/utility.interface';
+import { CreateUserDto } from 'src/infrastructure/DTOs/user.dto';
+import { FileInterface, UserInterface, loginInterface } from 'src/infrastructure/interfaces/utility.interface';
 import { AuthService } from './auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 // import fileUpload from 'src/assistantServices/aws-file-upload.service';
@@ -36,24 +36,31 @@ export class AuthController {
       .build({
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
       }),
-  ) avatar: FileInterface, @Body() createUserDto: CreateUserDto) {
+  ) avatar: FileInterface, @Body() createUserDto: CreateUserDto): Promise<UserInterface>{
     // const uploadAvatarLink: unknown = await fileUpload(avatar)  
 
     try {
       const userCreated = await this.authService.createUser(createUserDto);
-      const { user, success } = userCreated
-      const { user_email } = user
-
+      const { user_email, success } = userCreated
+     
       if (success) {
-        await this.emailServices.sendConfirmationLink({ user_email: `${user_email}` })
+        await this.emailServices.sendConfirmationLink({ user_email })
       }
-
       await this.globalServices.setAccessToken(response, user_email)
+      const user: UserInterface = {
+        _id: userCreated._id,
+        user_firstName: userCreated.user_firstName,
+        user_lastName: userCreated.user_lastName,
+        user_email: userCreated.user_email,
+        user_password: userCreated.user_password,
+        user_city: userCreated.user_city,
+        user_deliveryAddress: userCreated.user_deliveryAddress,
+        user_phone: userCreated.user_phone,
+        success: true,
+    };
 
-      return response.status(HttpStatus.OK).send({
-        user: userCreated
-      })
-    } catch (error) {
+      return user
+         } catch (error) {
       throw new BusinessException(
         'users',
         `${error.message}`,
@@ -65,7 +72,7 @@ export class AuthController {
 
   @Post('/login')
   @UseGuards(LocalAuthGuard)
-  async login(@Request() req, @Res({ passthrough: true }) response: Response) {
+  async login(@Request() req, @Res({ passthrough: true }) response: Response): Promise<loginInterface> {
     try {
       const { user } = req
       if (await this.globalServices.setAccessToken(response, user.user_email)) {
@@ -75,7 +82,6 @@ export class AuthController {
         }
       }
     } catch (error) {
-
       throw new BusinessException(
         'users',
         `${error.message}`,
@@ -87,7 +93,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  async getProfile(@Request() req) {
+  async getProfile(@Request() req): Promise<loginInterface> {
     const {user} = req
     delete user.user_password
     return {
