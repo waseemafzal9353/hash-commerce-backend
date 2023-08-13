@@ -5,6 +5,10 @@ export class CreateUserDto{
    
     @IsString()
     @IsNotEmpty()
+    user_id!: ObjectId;
+
+    @IsString()
+    @IsNotEmpty()
     user_firstName!: string;
 
     @IsString()
@@ -34,17 +38,6 @@ export class CreateUserDto{
     @IsString()
     @IsNotEmpty()
     uploadAvatarLink!: string;
-};
-
-export class ConfirmEmailDto {
-    
-    @IsString()
-    @IsNotEmpty()
-    token: string;
-
-    @IsString()
-    @IsNotEmpty()
-    email: string;
 };
 
 export class LoginUserDto{

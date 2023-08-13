@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose'
 import { Review } from './review.schema';
-import { Admin } from './admin.schema';
+import { AdminModel } from './admin.schema';
 
 export type ProductDocument = mongoose.HydratedDocument<Product>;
 
 @Schema()
 export class Product {
   @Prop({type: mongoose.Schema.Types.ObjectId, ref:'Admin'})
-  admin!: Admin;
+  admin!: AdminModel;
 
   @Prop(String)
   product_name!: string;
@@ -23,7 +23,7 @@ export class Product {
   product_ratings!:[number];
 
   @Prop([{type: mongoose.Schema.Types.ObjectId, ref:"Review"}])
-  product_reviews!:[Review];
+  product_reviews?:[Review];
 
   @Prop(Number)
   product_stock!: number;
