@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { User } from "../schemas/user.schema";
+import { Role } from "../enums/gloabal.enum";
 
 export interface UserInterface {
   _id: Types.ObjectId;
@@ -12,6 +13,7 @@ export interface UserInterface {
   user_phone: string;
   // user_avatar: string
   success?: boolean;
+  role?:Role
 };
 
 export interface FileInterface {
@@ -28,6 +30,7 @@ export interface FileInterface {
 
 export interface jwtPayloadInterface {
   sub: any;
+  roles?:Role[]
 };
 
 export interface jwtDecodePayloadInterface{
